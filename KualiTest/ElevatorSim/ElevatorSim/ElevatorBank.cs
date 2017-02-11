@@ -24,7 +24,7 @@ namespace ElevatorSim
                 _elevators.Add(newElevator);
             }
 
-
+            // start thread to run TickSystem and then sleep for a few seconds
         }
 
         public void RequestElevator(int floorNum)
