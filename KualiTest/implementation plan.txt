@@ -1,0 +1,20 @@
+ElevatorObserver behavior
+ - onElevatorOpen
+ - onElevatorClose
+ - onElevatorChangeFloor
+
+Elevator class
+ - multiple states: StoppedOpen, StoppedClosed, Moving, Maintenance
+ - notifies observers:
+  - doors close
+  - doors open
+  - floor change
+ - handle floor requests from inside
+ - statistics
+  - numTrips
+  - floorsPassed  
+ 
+ElevatorBank class
+ - initialize n Elevators each with min/max floor
+ - handle requests from each floor
+ 
