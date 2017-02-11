@@ -10,6 +10,7 @@ namespace ElevatorSim
     {
         enum ElevatorStatus
         {
+            Idle,
             Stopping,
             StoppedOpen,
             StoppedClosed,
@@ -28,8 +29,21 @@ namespace ElevatorSim
             this.UID = uid;
             _maxFloor = maxFloor;
             _currentFloor = 1;
-            _currentStatus = ElevatorStatus.StoppedClosed;
+            _currentStatus = ElevatorStatus.Idle;
             _observers = new List<IElevatorObserver>();
+        }
+
+        public bool WillPass(int floorNum)
+        {
+            if ((floorNum > _maxFloor) || (floorNum < 1)) { return false; }
+            if ((_currentStatus == ElevatorStatus.MovingUp) && (floorNum > _currentFloor)) { return true; }
+            if ((_currentStatus == ElevatorStatus.MovingDown) && (floorNum < _currentFloor)) { return true; }
+            return false;
+        }
+
+        public bool IsIdle()
+        {
+            return (_currentStatus == ElevatorStatus.Idle);
         }
 
         public string UID { get; }

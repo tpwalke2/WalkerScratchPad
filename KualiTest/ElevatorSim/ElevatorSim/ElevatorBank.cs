@@ -25,6 +25,35 @@ namespace ElevatorSim
             }
         }
 
+        public void RequestElevator(int floorNum)
+        {
+            bool handled = false;
+            foreach (Elevator e in _elevators)
+            {
+                if (e.WillPass(floorNum))
+                {
+                    // tell e to stop at floorNum on the way
+                    handled = true;
+                }
+            }
+
+            if (!handled)
+            {
+                foreach (Elevator e in _elevators)
+                {
+                    if (!e.IsIdle()) { continue; }
+
+                    // tell e to go to floor num
+                    handled = true;
+                }
+            }
+
+            if (!handled)
+            {
+                // elevator bank cannot handle request
+            }
+        }
+
         public void ElevatorClosed(Elevator e) { }
         public void ElevatorOpened(Elevator e) { }
         public void ElevatorChangedFloors(Elevator e, int floorNum) { }
