@@ -37,10 +37,31 @@ namespace ElevatorSim
 
         public void Tick()
         {
+            // for each tick, this elevator may either change status, or change floors, but not both
+
             switch (_currentStatus)
             {
                 case ElevatorStatus.Maintenance:
                     // elevator is in maintenance mode, do nothing
+                    break;
+                case ElevatorStatus.Idle:
+                    if (_destinationFloors.Count > 0)
+                    {
+                        var nextDestination = _destinationFloors.ElementAt(0);
+                        if (nextDestination > _currentFloor)
+                        {
+                            _currentStatus = ElevatorStatus.MovingUp;
+                        } else if (nextDestination < _currentFloor)
+                        {
+                            _currentStatus = ElevatorStatus.MovingDown;
+                        } else
+                        {
+                            // next destination is this floor
+                            _currentStatus = ElevatorStatus.StoppedOpen;
+                            _destinationFloors.Remove(nextDestination);
+                            notifyOpened();
+                        }
+                    }
                     break;
             }
         }

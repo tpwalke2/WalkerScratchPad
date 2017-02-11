@@ -23,6 +23,8 @@ namespace ElevatorSim
                 newElevator.AddObserver(this);
                 _elevators.Add(newElevator);
             }
+
+
         }
 
         public void RequestElevator(int floorNum)
@@ -30,27 +32,26 @@ namespace ElevatorSim
             bool handled = false;
             foreach (Elevator e in _elevators)
             {
-                if (e.WillPass(floorNum))
-                {
-                    // tell e to stop at floorNum on the way
-                    handled = true;
-                }
+                if (!e.WillPass(floorNum)) { continue; }
+
+                e.AddDestination(floorNum);
+                handled = true;
+                break;
+            }
+
+            if (handled) { return; }
+
+            foreach (Elevator e in _elevators)
+            {
+                if (!e.IsIdle()) { continue; }
+
+                e.AddDestination(floorNum);
+                handled = true;
             }
 
             if (!handled)
             {
-                foreach (Elevator e in _elevators)
-                {
-                    if (!e.IsIdle()) { continue; }
-
-                    // tell e to go to floor num
-                    handled = true;
-                }
-            }
-
-            if (!handled)
-            {
-                // elevator bank cannot handle request
+                // elevator bank cannot handle request, notify building maintenance
             }
         }
 
