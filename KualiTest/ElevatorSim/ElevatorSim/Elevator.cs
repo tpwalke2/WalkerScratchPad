@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElevatorSim
 {
@@ -24,6 +21,9 @@ namespace ElevatorSim
         private IList<IElevatorObserver> _observers;
         private SortedSet<int> _destinationFloors;
 
+        private int _floorsPassed;
+        private int _tripsMade;
+
         public Elevator(string uid, int maxFloor)
         {
             this.UID = uid;
@@ -32,8 +32,16 @@ namespace ElevatorSim
             _currentStatus = ElevatorStatus.Idle;
             _observers = new List<IElevatorObserver>();
             _destinationFloors = new SortedSet<int>();
+
+            _floorsPassed = 0;
+            _tripsMade = 0;
         }
 
+        /**
+         * Tick this elevator given the current status, floor, and potential destinations.
+         * 
+         * A trip is counted as starting if currently in the idle state and the next destination starts a movement operation.
+         */
         public void Tick()
         {
             switch (_currentStatus)
@@ -42,14 +50,24 @@ namespace ElevatorSim
                     // elevator is in maintenance mode, do nothing
                     break;
                 case ElevatorStatus.Idle:
+                    if (_tripsMade % 100 == 0)
+                    {
+                        // standard servicing cycle
+                        _currentStatus = ElevatorStatus.Maintenance;
+                        break;
+                    }
+
+                    // is there anything to do?
                     if (_destinationFloors.Count == 0) { break; }
 
                     if (_destinationFloors.ElementAt(0) > _currentFloor)
                     {
                         _currentStatus = ElevatorStatus.MovingUp;
+                        _tripsMade++;
                     } else if (_destinationFloors.ElementAt(0) < _currentFloor)
                     {
                         _currentStatus = ElevatorStatus.MovingDown;
+                        _tripsMade++;
                     } else
                     {
                         // next destination is this floor
@@ -60,6 +78,7 @@ namespace ElevatorSim
                     break;
                 case ElevatorStatus.MovingUp:
                     notifyChangedFloors(++_currentFloor);
+                    _floorsPassed++;
 
                     if (_destinationFloors.ElementAt(0) == _currentFloor)
                     {
@@ -75,6 +94,7 @@ namespace ElevatorSim
                     break;
                 case ElevatorStatus.MovingDown:
                     notifyChangedFloors(--_currentFloor);
+                    _floorsPassed++;
 
                     if (_destinationFloors.ElementAt(0) == _currentFloor)
                     {
@@ -116,6 +136,9 @@ namespace ElevatorSim
             }
         }
 
+        /**
+         * This is used by the bank to send an elevator to a floor. This should also be used from within the elevator to go to another floor.
+         */
         public bool AddDestination(int floorNum)
         {
             if ((floorNum > _maxFloor) || (floorNum < 1)) { return false; }
@@ -141,6 +164,16 @@ namespace ElevatorSim
         }
 
         public string UID { get; }
+
+        public int TripsMade
+        {
+            get { return _tripsMade; }
+        }
+
+        public int FloorsPassed
+        {
+            get { return _floorsPassed; }
+        }
 
         public void AddObserver(IElevatorObserver observer)
         {
