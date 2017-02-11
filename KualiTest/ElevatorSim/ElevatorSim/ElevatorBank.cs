@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace ElevatorSim
 {
     public class ElevatorBank : IElevatorObserver
     {
         private IList<Elevator> _elevators;
+        private const int TICKTIMEOUT = 5000;
 
         public ElevatorBank()
         {
             _elevators = new List<Elevator>();
         }
 
-        public void initialize(int numElevators, int numFloors)
+        /**
+         * Initializes the elevator bank with desired number of elevators and floors then starts the system.
+         */
+        public void Initialize(int numElevators, int numFloors)
         {
             for (int i = 1; i <= numElevators; i++)
             {
@@ -24,35 +26,35 @@ namespace ElevatorSim
                 _elevators.Add(newElevator);
             }
 
-            // start thread to run TickSystem and then sleep for a few seconds
+            var ticker = new Thread(new ThreadStart(this.TickSystem));
+            ticker.Start();
         }
 
+        /**
+         * Handles calls made from outside of the elevator.
+         */
         public void RequestElevator(int floorNum)
         {
-            bool handled = false;
+            // first, find the first elevator that will be traveling by the requested floor
             foreach (Elevator e in _elevators)
             {
                 if (!e.WillPass(floorNum)) { continue; }
-
+                // found one that is moving, use it
                 e.AddDestination(floorNum);
-                handled = true;
-                break;
+                return;
             }
 
-            if (handled) { return; }
-
+            // next, find the first idle elevator
             foreach (Elevator e in _elevators)
             {
                 if (!e.IsIdle()) { continue; }
 
+                // found one, use it
                 e.AddDestination(floorNum);
-                handled = true;
+                return;
             }
 
-            if (!handled)
-            {
-                // elevator bank cannot handle request, notify building maintenance
-            }
+            // elevator bank cannot handle this request, notify building maintenance
         }
 
         public void TickSystem()
@@ -61,6 +63,8 @@ namespace ElevatorSim
             {
                 e.Tick();
             }
+
+            Thread.Sleep(TICKTIMEOUT);
         }
 
         public void ElevatorClosed(Elevator e) { }

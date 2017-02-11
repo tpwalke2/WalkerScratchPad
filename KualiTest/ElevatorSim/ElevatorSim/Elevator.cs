@@ -11,7 +11,6 @@ namespace ElevatorSim
         enum ElevatorStatus
         {
             Idle,
-            Stopping,
             StoppedOpen,
             StoppedClosed,
             MovingUp,
@@ -60,9 +59,35 @@ namespace ElevatorSim
                     }
                     break;
                 case ElevatorStatus.MovingUp:
-                    
+                    notifyChangedFloors(++_currentFloor);
+
+                    if (_destinationFloors.ElementAt(0) == _currentFloor)
+                    {
+                        // next destination is this floor
+                        _currentStatus = ElevatorStatus.StoppedOpen;
+                        _destinationFloors.Remove(_destinationFloors.ElementAt(0));
+                        notifyOpened();
+                    } else if ((_destinationFloors.ElementAt(0) < _currentFloor) || (_currentFloor == _maxFloor))
+                    {
+                        _currentStatus = ElevatorStatus.MovingDown;
+                    }
+
                     break;
                 case ElevatorStatus.MovingDown:
+                    notifyChangedFloors(--_currentFloor);
+
+                    if (_destinationFloors.ElementAt(0) == _currentFloor)
+                    {
+                        // next destination is this floor
+                        _currentStatus = ElevatorStatus.StoppedOpen;
+                        _destinationFloors.Remove(_destinationFloors.ElementAt(0));
+                        notifyOpened();
+                    }
+                    else if ((_destinationFloors.ElementAt(0) > _currentFloor) || (_currentFloor == 1))
+                    {
+                        _currentStatus = ElevatorStatus.MovingUp;
+                    }
+
                     break;
                 case ElevatorStatus.StoppedOpen:
                     _currentStatus = ElevatorStatus.StoppedClosed;
