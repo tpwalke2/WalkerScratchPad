@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace ElevatorSim
 {
-    public class Elevator: IElevatorObserver
+    public class Elevator
     {
         enum ElevatorStatus
         {
+            Stopping,
             StoppedOpen,
             StoppedClosed,
-            Moving,
+            MovingUp,
+            MovingDown,
             Maintenance
         }
 
@@ -35,6 +37,30 @@ namespace ElevatorSim
         public void AddObserver(IElevatorObserver observer)
         {
             if (!_observers.Contains(observer)) { _observers.Add(observer); }
+        }
+
+        private void notifyClosed()
+        {
+            foreach (IElevatorObserver observer in _observers)
+            {
+                observer.ElevatorClosed(this);
+            }
+        }
+
+        private void notifyOpened()
+        {
+            foreach (IElevatorObserver observer in _observers)
+            {
+                observer.ElevatorOpened(this);
+            }
+        }
+
+        private void notifyChangedFloors(int currentFloor)
+        {
+            foreach (IElevatorObserver observer in _observers)
+            {
+                observer.ElevatorChangedFloors(this, currentFloor);
+            }
         }
     }
 }

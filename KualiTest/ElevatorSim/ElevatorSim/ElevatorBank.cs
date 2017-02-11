@@ -24,5 +24,9 @@ namespace ElevatorSim
                 _elevators.Add(newElevator);
             }
         }
+
+        public void ElevatorClosed(Elevator e) { }
+        public void ElevatorOpened(Elevator e) { }
+        public void ElevatorChangedFloors(Elevator e, int floorNum) { }
     }
 }

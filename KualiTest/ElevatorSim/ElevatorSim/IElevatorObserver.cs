@@ -8,5 +8,8 @@ namespace ElevatorSim
 {
     public interface IElevatorObserver
     {
+        void ElevatorClosed(Elevator e);
+        void ElevatorOpened(Elevator e);
+        void ElevatorChangedFloors(Elevator e, int floorNum);
     }
 }
