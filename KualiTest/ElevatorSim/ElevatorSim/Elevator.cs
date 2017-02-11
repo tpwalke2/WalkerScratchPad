@@ -23,6 +23,7 @@ namespace ElevatorSim
         private ElevatorStatus _currentStatus;
         private int _currentFloor;
         private IList<IElevatorObserver> _observers;
+        private SortedSet<int> _destinationFloors;
 
         public Elevator(string uid, int maxFloor)
         {
@@ -31,6 +32,23 @@ namespace ElevatorSim
             _currentFloor = 1;
             _currentStatus = ElevatorStatus.Idle;
             _observers = new List<IElevatorObserver>();
+            _destinationFloors = new SortedSet<int>();
+        }
+
+        public void Tick()
+        {
+            switch (_currentStatus)
+            {
+                case ElevatorStatus.Maintenance:
+                    // elevator is in maintenance mode, do nothing
+                    break;
+            }
+        }
+
+        public bool AddDestination(int floorNum)
+        {
+            if ((floorNum > _maxFloor) || (floorNum < 1)) { return false; }
+            return _destinationFloors.Add(floorNum);
         }
 
         public bool WillPass(int floorNum)
@@ -44,6 +62,11 @@ namespace ElevatorSim
         public bool IsIdle()
         {
             return (_currentStatus == ElevatorStatus.Idle);
+        }
+
+        public void PerformMaintenance()
+        {
+            _currentStatus = ElevatorStatus.Idle;
         }
 
         public string UID { get; }

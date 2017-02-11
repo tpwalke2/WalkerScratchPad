@@ -54,6 +54,14 @@ namespace ElevatorSim
             }
         }
 
+        public void TickSystem()
+        {
+            foreach (Elevator e in _elevators)
+            {
+                e.Tick();
+            }
+        }
+
         public void ElevatorClosed(Elevator e) { }
         public void ElevatorOpened(Elevator e) { }
         public void ElevatorChangedFloors(Elevator e, int floorNum) { }
