@@ -4,6 +4,7 @@ ElevatorObserver behavior
  - onElevatorChangeFloor
 
 Elevator class
+ - unique ID for *this* elevator
  - multiple states: StoppedOpen, StoppedClosed, Moving, Maintenance
  - notifies observers:
   - doors close
