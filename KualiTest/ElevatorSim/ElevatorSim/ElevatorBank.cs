@@ -8,6 +8,7 @@ namespace ElevatorSim
     {
         private IList<Elevator> _elevators;
         private const int TICKTIMEOUT = 5000;
+        private bool _done;
 
         public ElevatorBank()
         {
@@ -25,6 +26,8 @@ namespace ElevatorSim
                 newElevator.AddObserver(this);
                 _elevators.Add(newElevator);
             }
+
+            _done = false;
 
             var ticker = new Thread(new ThreadStart(this.TickSystem));
             ticker.Start();
@@ -59,12 +62,20 @@ namespace ElevatorSim
 
         public void TickSystem()
         {
-            foreach (Elevator e in _elevators)
+            while (!_done)
             {
-                e.Tick();
-            }
+                foreach (Elevator e in _elevators)
+                {
+                    e.Tick();
+                }
 
-            Thread.Sleep(TICKTIMEOUT);
+                Thread.Sleep(TICKTIMEOUT);
+            }
+        }
+
+        public void Stop()
+        {
+            _done = true;
         }
 
         public void ElevatorClosed(Elevator e) { }
